@@ -14,7 +14,7 @@ nsim = 10
 
 ntag = 10
 
-slope=c(rep(1, ntag*nsim), rep(1.5, ntag*nsim))
+slope=c(rep(1, ntag\*nsim), rep(1.5, ntag\*nsim))
 
 data(datMean)
 
