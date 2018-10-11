@@ -74,7 +74,7 @@ analyzeMPRA <- function(datt, nrepIn, rnaCol, nrepOut, nsim, ntag, method=c("MW"
 		if("Fisher" %in% method)
 		{	message("==== Applying the Fisher's Exact test... \n")
 			result_fisher = run_fisherExact(oligo, ntag, nsim, nrep)
-			resultAll = merge(result_all, result_fisher, by="simN", sort=F, all.x=T)
+			resultAll = merge(resultAll, result_fisher, by="simN", sort=F, all.x=T)
 		}
 
 		
@@ -113,4 +113,5 @@ analyzeMPRA <- function(datt, nrepIn, rnaCol, nrepOut, nsim, ntag, method=c("MW"
 		
     	return(resultAll)
 }
+
 

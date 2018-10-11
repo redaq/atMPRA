@@ -1,9 +1,8 @@
-run_adaptive <-
-function(combos, inputCutoff, ntag, nsim, res_MW, res_matching, inputTest)
+run_adaptive <- function(combos, inputCutoff, ntag, nsim, res_MW, res_matching, inputTest)
 { 		result = data.frame(combos, res_adaptive=NA)
    		for(x in combos)
    		{
-  			if(inputTest[x] >= inputCutoff)
+  			if(is.na(inputTest[x])|inputTest[x] >= inputCutoff)
   			{		result$res_adaptive[x] = res_MW[x]
   			}else
   			{		result$res_adaptive[x] = res_matching[x]
@@ -11,3 +10,4 @@ function(combos, inputCutoff, ntag, nsim, res_MW, res_matching, inputTest)
    		}
    		return (result)
 }
+
