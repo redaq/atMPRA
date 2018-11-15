@@ -1,4 +1,4 @@
-export(getPower, sim_fixTotalD, sim_fixMeanD, sim_fixInputDist, analyzeMPRA, calEnrichment)
+export(getPower, getPowerOne, sim_fixInputMean, sim_fixDepth, estimateMPRA, sim_fixTotalD, sim_fixMeanD, sim_fixInputDist, analyzeMPRA, calEnrichment)
 import(DESeq2, QuASAR, mpra, coin, MatchIt, edgeR)
 importFrom("stats", "aggregate", "dhyper", "fisher.test",
              "model.matrix", "phyper", "pnorm", "rnbinom", "t.test")
