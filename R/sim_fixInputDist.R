@@ -1,6 +1,9 @@
 sim_fixInputDist <- function(mean_A, mean_B, std_A, std_B,  sigma2_DNA_a0, sigma2_DNA_a1, sigma2_RNA_a0, sigma2_RNA_a1, ntag=33, nsim=100, nrep=5, measurementERROR=TRUE, slope) 
 ### Slope can be 1, or a vector of length ntag*nsim*2 , where every ntag is one allele 
 {
+	  if(length(slope)!= (2*ntag*nsim)  & length(slope)!=1)
+          {     stop("Length of slope parameter needs to be 2*ntag*nsim, with the first half correpsonding to the slopes for the reference allele, and second half corresponding to the mutant allele.\n")
+          }
 	  allele <-c(rep("Ref", ntag*nsim), rep("Mut", ntag*nsim))
 	  simN <- c(rep(1:nsim, each=ntag), rep(1:nsim, each=ntag))
 	  datt <- data.frame(allele, simN)

@@ -4,27 +4,28 @@ analyzeMPRA <- function(datt, nrepIn, rnaCol, nrepOut, nsim, ntag, method=c("MW"
 		### normalization
 		message("==== Normalizing samples using the maximum library depth...\n")
 		nrep = nrepOut
-		normFactor = max(colSums(datt[,3:(2+2*nrep)], na.rm=T))
+		normFactor = max(colSums(datt[,3:(2+nrepIn+nrepOut)], na.rm=T))
 		counts = data.frame(t( t(datt[,-c(1:2)])/colSums(datt[,-c(1:2)], na.rm=T))*normFactor)
 		meanInput = apply(as.matrix(counts[, 1:nrepIn]), 1, mean, na.rm=T)
 		newDNA =t(do.call(rbind, replicate(nrepOut, meanInput, simplify=FALSE)) )
 		colnames(newDNA) = paste0("input_rep", 1:nrepOut)
 		
 		datt4 = cbind(datt[,1:2], newDNA, counts[, (rnaCol-2):(rnaCol-2-1+nrepOut)])
-		colnames(datt4) = colnames(datt)
+		colnames(datt4)[3:(2+nrep)] = paste("input_rep", 1:nrep, sep="_")
+		colnames(datt4)[(3+nrep):(2+nrep*2)] = paste("output_rep", 1:nrep, sep="_")
 
 		#### filtering
 		message("==== Filtering tags with DNA counts less than or equal to ", cutoff, ", and with RNA counts less than or equal to ", cutoffo, ".\n")
 		if(cutoff==-1 & cutoffo==-1)
 		{	keep=rep(TRUE, nrow(datt))  
 			datt2 = datt4
-			naindex = which(is.na(datt2), arr.ind=T)
-			datt2[naindex] = 0
 		}else
 		{
-			keep = apply((datt[,3:(2+2*nrep)]), 1, function(x) all(!is.na(as.numeric(x[1:nrep]))&as.numeric(x[1:nrep])>cutoff, na.rm=T)&all(!is.na(as.numeric(x[(nrep+1):(2*nrep)]))&as.numeric(x[(nrep+1):(2*nrep)])>cutoffo, na.rm=T))
+			keep = apply((datt[,3:(2+nrepIn+nrepOut)]), 1, function(x) ( mean(as.numeric(x[1:nrepIn]), na.rm=T)>cutoff)& (mean(as.numeric(x[(nrepIn+1):(nrepIn+nrepOut)]), na.rm=T)>cutoffo))
 			datt2 = datt4[keep,]
 		}
+		naindex = which(is.na(datt2), arr.ind=T)
+		datt2[naindex] = 0
 		### This is the data frame after filtering
 		datt3 = datt4
 		datt3[!keep, 3:(2+2*nrep)] = NA
@@ -87,7 +88,7 @@ analyzeMPRA <- function(datt, nrepIn, rnaCol, nrepOut, nsim, ntag, method=c("MW"
 			if("mpralm" %in% method)
 			{	message("==== Applying the mpralm methods... \n")
 				result_mpralm = run_mpralm(datt3, ntag, nsim, nrep)
-				if(all(!is.na(result_mpralm[[1]])))
+				if(any(!is.na(result_mpralm[[1]])))
 				{	result_mpralm[[1]]$simN = rownames(result_mpralm[[1]])
 					result_mpralm[[2]]$simN = rownames(result_mpralm[[2]])
 					result_mpralm2 = merge(result_mpralm[[1]], result_mpralm[[2]], by="simN", sort=F, all.x=T)
