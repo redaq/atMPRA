@@ -42,14 +42,14 @@ slopel = GSE70531_params[[4]](runif(nsim*2))
 slope = rep(slopel, each=ntag)
 ```
 
-### simulate data that resembles the GSE70531
+### Simulate data that resembles the GSE70531
 ```r
 datt=sim_fixDepth(inputProp, ntag, nsim, nrepIn,  nrepOut, slope, inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc, sampleDepth=totalDepth) 
 
 rnaCol=8
 ```
 
-### estimate model parameters for the simulated data
+### Estimate model parameters for the simulated data
 ```r
 result=estimateMPRA(datt, nrepIn, rnaCol, nrepOut, nsim, ntag)
 ```
@@ -59,7 +59,7 @@ result=estimateMPRA(datt, nrepIn, rnaCol, nrepOut, nsim, ntag)
 results2 = analyzeMPRA(datt, nrepIn, rnaCol, nrepOut, nsim, ntag, method=c("MW", "Matching", "Adaptive", "Fisher", "QuASAR", "T-test", "mpralm", "edgeR", "DESeq2"), cutoff=0, cutoffo=0)
 ```
 
-### simulate data with fixed mean tag counts for the two alleles
+### Simulate data with fixed mean tag counts for the two alleles
 ```r
 inputDist= GSE70531_params[[3]](runif(nsim*ntag*2))
 
