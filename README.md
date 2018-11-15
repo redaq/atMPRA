@@ -54,7 +54,7 @@ rnaCol=8
 result=estimateMPRA(datt, nrepIn, rnaCol, nrepOut, nsim, ntag)
 ```
 
-### test allele-specific effects using specified methods
+### Test allele-specific effects using specified methods
 ```r
 results2 = analyzeMPRA(datt, nrepIn, rnaCol, nrepOut, nsim, ntag, method=c("MW", "Matching", "Adaptive", "Fisher", "QuASAR", "T-test", "mpralm", "edgeR", "DESeq2"), cutoff=0, cutoffo=0)
 ```
