@@ -7,7 +7,9 @@ Power calculation for designing MPRA experiments
 This function computes the power (or type I error if under the null) of the specified tests using simulated MPRA data with user-specified parameters for the MPRA experiment.
 }
 \usage{
-getPower(nsim = 100, ntag = 10, nrep = 1, slope = NA, scenario = c("fixInputDist", "fixTotalDepth", "fixMeanDepth"), method = c("MW", "Matching", "Adaptive", "Fisher", "QuASAR", "T-test", "mpralm", "edgeR", "DESeq2"), sigma2_DNA_a0, sigma2_DNA_a1, sigma2_RNA_a0, sigma2_RNA_a1, fixInput = NA, fixMeanD = 70, fixTotalD = 2e+07, datMean = NA, cutoff = -1, cutoffo = -1)
+
+
+getPower(nsim = 100, ntag = 10, nrepIn = 2, nrepOut=2, slope = 1, scenario=c("fixInputDist", "fixTotalDepth", "fixMeanDepth"), method=c("MW", "Matching", "Adaptive", "Fisher", "QuASAR", "T-test", "mpralm", "edgeR", "DESeq2"), fixInput  = c(20, 100), fixMeanD = 70 , fixTotalD= 20000000, std_A=mean_A, std_B=mean_B, inputDist=NULL, inputDispFunc=NULL, outputDispFunc=NULL, inputDispParam=NULL, outputDispParam=NULL, cutoff=-1, cutoffo=-1)
 }
 \arguments{
   \item{nsim}{
@@ -16,11 +18,14 @@ An integer indicating the number of simulations or number of SNPs included in th
   \item{ntag}{
 An integer indicating the number of tags/barcodes for each oligonucleotide (oligos) or each allele
 }
-  \item{nrep}{
-An integer indicating the number of replicates 
+  \item{nrepIn}{
+An integer indicating the number of DNA replicates 
+}
+  \item{nrepOut}{
+An integer indicating the number of RNA replicates 
 }
   \item{slope}{
-A numeric vector of length 2*\code{nsim}*\code{ntag} specifying the transfection efficiencies across the oligos in the simulated data. The first half is for the reference allele, and the second half is for the mutant allele. To compute the power, the first half  would be different from the values in the second half of the vector (under the alternative). This is referred as 'b' in the paper. See examples below.
+A numeric vector of length 1 or 2*\code{nsim}*\code{ntag} specifying the transfection efficiencies across the oligos in the simulated data. The first half is for the reference allele, and the second half is for the mutant allele. To compute the power, the first half  would be different from the values in the second half of the vector (under the alternative). This is referred as 'b' in the paper. See examples below.
 }
   \item{scenario}{
 Three different simulation scenarios are included. This includes \\
@@ -31,31 +36,41 @@ Three different simulation scenarios are included. This includes \\
   \item{method}{
 Accepts a vector of characters specifying the tests to be used. The possible options are: MW, Matching, Adaptive, Fisher, QuASAR, T-test, mpralm, edgeR and DESeq2.
 }
-  \item{sigma2_DNA_a0}{
-This parameter and the \code{sigma2_DNA_a1} parameter specify the relationship between the dispersion parameter and the mean count across replicates for the DNA counts in the simulation. Given the true input count for the tag, the observed input counts across the replicates were generated using a negative binomial distribution with mean equal to the true input count, and dispersion parameter = a0 + a1/mean.
-}
-  \item{sigma2_DNA_a1}{
-This parameter and the \code{sigma2_DNA_a0} parameter specify the relationship between the dispersion parameter and the mean count across replicates for the DNA counts in the simulation. Given the true input count for the tag, the observed input counts for this tag across the replicates were generated using a negative binomial distribution with mean equal to the true input count, and the dispersion parameter equals to a0 + a1/mean.
-
-}
-  \item{sigma2_RNA_a0}{
-This parameter and the \code{sigma2_RNA_a1} parameter specify the relationship between the dispersion parameter and the mean count across replicates for the RNA counts in the simulation. Given the true input count for the tag, the observed RNA counts across the replicates were generated using a negative binomial distribution with mean equal to the transfection efficiency times the true input count, and dispersion parameter = a0 + a1/mean.
-}
-  \item{sigma2_RNA_a1}{
-This parameter and the \code{sigma2_RNA_a0} parameter specify the relationship between the dispersion parameter and the mean count across replicates for the RNA counts in the simulation. Given the true input count for the tag, the observed RNA counts across the replicates were generated using a negative binomial distribution with mean equal to the transfection efficiency (as specified using slope) times the true input count, and dispersion parameter = a0 + a1/mean.
-}
   \item{fixInput}{
-If scenario is \code{fixInputDist}, a numeric vector of length 4 is expected. The four values correspond to the mean and sd of the true input counts for the reference allele, and the mean and sd of the true input counts for the mutant allele.
+A vector of two numeric values specifying the mean of input count for the reference and alternative alleles for all SNPs.
 }
+ 
   \item{fixMeanD}{
 If scenario is \code{fixTotalDepth}, a numeric number is expected, which is the total reads across all tags.
 }
   \item{fixTotalD}{
 If scenario is \code{fixMeanDepth}, a numeric value is expected, which is the mean reads across all tags. 
 }
-  \item{datMean}{
-If scenario is specified to be \code{fixTotalDepth} or \code{fixMeanDepth}, a vector of numeric values is expected, otherwise it can be left as NA. There is no requirement in length. The true input counts for each tag will be sampled from this vector (before scaling).
+
+  \item{std_A}{
+An optional parameter specifying the standard devaition of the mean input counts across tags for the reference allele.
 }
+  \item{std_B}{
+An optional parameter specifying the standard devaition of the mean input counts across tags for the mutant allele.
+
+}
+
+  \item{inputDist}{
+A vector of numerical proportions that can be used to generate the DNA proportions across the tags.
+}
+  \item{inputDispFunc}{
+Optional parameter that provides a dispersion function estimated for the input replicates using DESeq2.
+}
+  \item{outputDispFunc}{
+Optional parameter that provides a dispersion function estimated for the output replicates using DESeq2.
+}
+  \item{inputDispParam}{
+This parameter is required if inputDispFunc is not provided. It should give three parameter estimates for the dispersion function of the DNA input replicates. The three parameters correspond to a0, a1, and d2, which specify that the dispersion parameter is a lognormal distribution with mean log(a0+a1/mu) and sd d2, where mu is the mean of DNA count across the replicates.
+}
+  \item{outputDispParam}{
+This parameter is required if outputDispFunc is not provided. It should give three parameter estimates for the dispersion function of the RNA output replicates. The three parameters correspond to a0, a1, and d2, which specify that the dispersion parameter is a lognormal distribution with mean log(a0+a1/mu) and sd d2, where mu is the mean of RNA count across the replicates.
+}
+
   \item{cutoff}{
 A numeric or integer value. Tags with DNA count less than or equal to \code{cutoff} in any of the DNA replicates will be removed.
 }
@@ -85,10 +100,15 @@ Dandi Qiao
 \code{\link[atMPRA:analyzeMPRA]{atMPRA}}
 }
 \examples{
-nsim = 10
-ntag = 10
-slope=c(rep(1, ntag*nsim), rep(1.5, ntag*nsim)) 
-results = getPower(nsim = nsim, ntag = ntag, nrep = 1, slope=slope , scenario=c("fixInputDist"), method="MW", sigma2_DNA_a0=0.001, sigma2_DNA_a1=0.23, sigma2_RNA_a0=0.18, sigma2_RNA_a1=35, fixInput  = c(20, 120, 20, 120))
+data(GSE70531_params) 
+ntag= 10
+nsim= 10
+nrepIn=2
+nrepOut = 2
+inputDist= GSE70531_params[[3]](runif(nsim*ntag*2))
+inputDispFunc=GSE70531_params[[1]]
+outputDispFunc=GSE70531_params[[2]]
+result = getPower(nsim, ntag, nrepIn, nrepOut, slope = 1, scenario="fixInputDist", method=c("MW","T-test", "mpralm", "edgeR", "DESeq2"), fixInput  = c(20, 100), inputDist=inputDist, inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc,  cutoff=-1, cutoffo=-1)
 
 }
 \keyword{power}
