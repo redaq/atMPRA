@@ -87,7 +87,7 @@ slope = rep(slopel, each=ntag)
 
 result2 = getPower(nsim, ntag, nrepIn, nrepOut, slope, scenario="fixInputDist", method=c("MW","T-test", "mpralm", "edgeR", "DESeq2"), fixInput  = c(20, 100), inputDist=inputDist, inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc,  cutoff=-1, cutoffo=-1)
 
-result3 = getPower(nsim, ntag, nrepIn, nrepOut, slope=1, scenario="fixTotalDepth", method=c("MW", "Matching", "Adaptive", "Fisher", "QuASAR", "T-test", "mpralm", "edgeR", "DESeq2"), fixTotalD= 200000, inputDist=inputDist,inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc,  cutoff=-1, cutoffo=-1, method="none")
+result3 = getPower(nsim, ntag, nrepIn, nrepOut, slope=1, scenario="fixTotalDepth", method=c("MW", "Matching", "Adaptive", "Fisher", "QuASAR", "T-test", "mpralm", "edgeR", "DESeq2"), fixTotalD= 200000, inputDist=inputDist,inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc,  cutoff=-1, cutoffo=-1, p.adjust.method="none")
 
 ```
 
