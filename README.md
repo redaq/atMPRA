@@ -8,11 +8,11 @@ This R package is under development. Only the Beta version is available for test
 
 # Installation
 
-Please download the atMPRA_1.2.tar.gz file.
+Please download the atMPRA_1.3.tar.gz file.
 
 In R, type: 
 ```r
-install.packages("atMPRA_1.2.tar.gz", repos=NULL, type="source")
+install.packages("atMPRA_1.3.tar.gz", repos=NULL, type="source")
 
 library(atMPRA)
 ```
@@ -51,13 +51,12 @@ outputDispFunc=GSE70531_params[[2]]
 slope = rep(slopel, each=ntag)
 
 datt=sim_fixDepth(inputProp, ntag, nsim, nrepIn,  nrepOut, slope, inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc, sampleDepth=totalDepth) 
-
-rnaCol=8
 ```
 
 ### Estimate model parameters for the simulated data
 ```r
-new_params=estimateMPRA(datt, nrepIn, rnaCol, nrepOut, nsim, ntag)
+new_params=estimateMPRA(datt, nrepIn, rnaCol=8, nrepOut, nsim, ntag)
+
 datt=sim_fixDepth(inputProp=new_params[[3]](runif(ntag*nsim*2)), ntag, nsim, nrepIn,  nrepOut, slope, inputDispFunc=new_params[[1]], outputDispFunc=new_params[[2]], sampleDepth=totalDepth) 
 
 ```
