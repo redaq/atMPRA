@@ -19,11 +19,16 @@ library(atMPRA)
 
 # Examples
 ```r
+nsim=10
+
+ntag=10
+
+result = getPower(nsim=nsim, ntag=ntag, nrepIn=3, nrepOut=3, slope = c(rep(1, ntag*nsim), rep(2,ntag*nsim)), method=c("MW", "mpralm"), scenario="fixTotalDepth")
+```
+
+### Simulate data that resembles the GSE70531
+```r
 data(GSE70531_params) 
-
-inputDispFunc=GSE70531_params[[1]]
-
-outputDispFunc=GSE70531_params[[2]]
 
 totalDepth = 200000
 
@@ -39,11 +44,12 @@ inputProp = GSE70531_params[[3]](runif(ntag*nsim*2))
 
 slopel = GSE70531_params[[4]](runif(nsim*2))
 
-slope = rep(slopel, each=ntag)
-```
+inputDispFunc=GSE70531_params[[1]]
 
-### Simulate data that resembles the GSE70531
-```r
+outputDispFunc=GSE70531_params[[2]]
+
+slope = rep(slopel, each=ntag)
+
 datt=sim_fixDepth(inputProp, ntag, nsim, nrepIn,  nrepOut, slope, inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc, sampleDepth=totalDepth) 
 
 rnaCol=8
@@ -51,12 +57,14 @@ rnaCol=8
 
 ### Estimate model parameters for the simulated data
 ```r
-result=estimateMPRA(datt, nrepIn, rnaCol, nrepOut, nsim, ntag)
+new_params=estimateMPRA(datt, nrepIn, rnaCol, nrepOut, nsim, ntag)
+datt=sim_fixDepth(inputProp=new_params[[3]](runif(ntag*nsim*2)), ntag, nsim, nrepIn,  nrepOut, slope, inputDispFunc=new_params[[1]], outputDispFunc=new_params[[2]], sampleDepth=totalDepth) 
+
 ```
 
 ### Test allele-specific effects using specified methods
 ```r
-results2 = analyzeMPRA(datt, nrepIn, rnaCol, nrepOut, nsim, ntag, method=c("MW", "Matching", "Adaptive", "Fisher", "QuASAR", "T-test", "mpralm", "edgeR", "DESeq2"), cutoff=0, cutoffo=0)
+results = analyzeMPRA(datt, nrepIn, rnaCol, nrepOut, nsim, ntag, method=c("MW", "Adaptive", "QuASAR", "T-test", "mpralm", "DESeq2"), cutoff=0, cutoffo=0)
 ```
 
 ### Simulate data with fixed mean tag counts for the two alleles
@@ -78,9 +86,9 @@ slopel = c(slopel, slopel+1)
 
 slope = rep(slopel, each=ntag)
 
-result3 = getPower(nsim, ntag, nrepIn, nrepOut, slope, scenario="fixInputDist", method=c("MW","T-test", "mpralm", "edgeR", "DESeq2"), fixInput  = c(20, 100), inputDist=inputDist, inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc,  cutoff=-1, cutoffo=-1)
+result2 = getPower(nsim, ntag, nrepIn, nrepOut, slope, scenario="fixInputDist", method=c("MW","T-test", "mpralm", "edgeR", "DESeq2"), fixInput  = c(20, 100), inputDist=inputDist, inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc,  cutoff=-1, cutoffo=-1)
 
-result4 = getPower(nsim, ntag, nrepIn, nrepOut, slope=1, scenario="fixTotalDepth", method=c("MW", "Matching", "Adaptive", "Fisher", "QuASAR", "T-test", "mpralm", "edgeR", "DESeq2"), fixTotalD= 200000, inputDist=inputDist,inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc,  cutoff=-1, cutoffo=-1)
+result3 = getPower(nsim, ntag, nrepIn, nrepOut, slope=1, scenario="fixTotalDepth", method=c("MW", "Matching", "Adaptive", "Fisher", "QuASAR", "T-test", "mpralm", "edgeR", "DESeq2"), fixTotalD= 200000, inputDist=inputDist,inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc,  cutoff=-1, cutoffo=-1)
 
 ```
 
