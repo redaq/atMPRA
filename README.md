@@ -8,6 +8,11 @@ This R package is under development. Only the Beta version is available for test
 
 # Installation
 
+This package is dependent on the R packages: 
+coin, MatchIt (Available on CRAN)
+DESeq2,   mpra, edgeR (Avaiable on Bioconductor)
+QuASAR (Available here: https://github.com/piquelab/QuASAR)
+
 Please download the atMPRA_1.3.tar.gz file.
 
 In R, type: 
