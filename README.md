@@ -16,7 +16,8 @@ DESeq2,   mpra, edgeR (Avaiable on Bioconductor)
 
 QuASAR (Available here: https://github.com/piquelab/QuASAR)
 
-Please download the atMPRA_1.3.tar.gz file.
+
+After the packages above are successfully installed, please download the atMPRA_1.3.tar.gz file.
 
 In R, type: 
 ```r
@@ -25,7 +26,9 @@ install.packages("atMPRA_1.3.tar.gz", repos=NULL, type="source")
 library(atMPRA)
 ```
 
-# Examples
+More tutorials can be found in the [vignette](https://github.com/redaq/atMPRA/blob/master/atMPRA_vignettes.pdf). 
+
+# Quick example
 ```r
 nsim=10
 
