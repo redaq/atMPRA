@@ -1,5 +1,5 @@
 # @MPRA
-Analysis Tools for Massively Parallel Reporter Assay data
+Analysis Toolset for Massively Parallel Reporter Assay data
 
 A newer version of this package has been uploaded, though we are still actively working on the functions.
 
