@@ -1,10 +1,11 @@
 Package: atMPRA
 Type: Package
 Title: Analysis Toolset for MPRA data
-Version: 1.2
-Date: 2018-11-14
+Version: 1.7
+Date: 2020-01-22
 Author: Dandi Qiao, Peter J. Castaldi
 Maintainer: Dandi Qiao <redaq@channing.harvard.edu>
 Description: Includes the adaptive test and a number of other methods for analyzing MPRA data, and also functions for power calculation for designing MPRA experiments. The adaptive method is described in Qiao, D., Zigler, C., Cho, M.H., Silverman, E.K., Zhou, X., et al. (2018). Statistical considerations for the analysis of massively parallel reporter assays data.
 Depends: coin, MatchIt, edgeR, DESeq2, QuASAR, mpra
+LazyData: true
 License: GPL-2
