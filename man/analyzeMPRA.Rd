@@ -8,7 +8,7 @@ Analyze MPRA data using specified tests
 This function pre-processes the given MPRA data, and analyzes it using specified tests.
 }
 \usage{
-analyzeMPRA(datt, nrepIn, rnaCol, nrepOut, nsim, ntag, method = c("MW", "Matching", "Adaptive", "Fisher", "QuASAR", "T-test", "mpralm", "edgeR", "DESeq2"), cutoff = -1, cutoffo = -1)
+analyzeMPRA(datt, nrepIn, rnaCol, nrepOut, nsim, ntag, method = c("MW", "Matching", "Adaptive", "Fisher", "QuASAR", "T-test", "mpralm", "edgeR", "DESeq2"), cutoff = -1, cutoffo = -1, matched=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -39,6 +39,9 @@ A numeric or integer value. Tags with DNA count less than or equal to \code{cuto
 }
   \item{cutoffo}{
 A numeric or integer value. Tags with RNA count less than or equal to \code{cutoffo} in any of the RNA replicates will be removed.
+} 
+  \item{matched}{
+Whether the DNA samples are matching to the RNA samples in the correct order in the data frame \code{datt}.
 }
 }
 \details{

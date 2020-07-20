@@ -9,7 +9,7 @@ This function computes the power (or type I error if under the null) of the spec
 \usage{
 
 
-getPower(nsim = 100, ntag = 10, nrepIn = 2, nrepOut=2, slope = 1, scenario=c("fixInputDist", "fixTotalDepth", "fixMeanDepth"), method=c("MW", "Matching", "Adaptive", "Fisher", "QuASAR", "T-test", "mpralm", "edgeR", "DESeq2"), fixInput  = c(20, 100), fixMeanD = 70 , fixTotalD= 20000000, std_A=mean_A, std_B=mean_B, inputDist=NULL, inputDispFunc=NULL, outputDispFunc=NULL, inputDispParam=NULL, outputDispParam=NULL, cutoff=-1, cutoffo=-1)
+getPower(nsim = 100, ntag = 10, nrepIn = 2, nrepOut=2, slope = 1, scenario=c("fixInputDist", "fixTotalDepth", "fixMeanDepth"), method=c("MW", "Matching", "Adaptive", "Fisher", "QuASAR", "T-test", "mpralm", "edgeR", "DESeq2"), fixInput  = c(20, 100), fixMeanD = 70 , fixTotalD= 20000000, std_A=mean_A, std_B=mean_B, inputDist=NULL, inputDispFunc=NULL, outputDispFunc=NULL, inputDispParam=NULL, outputDispParam=NULL, cutoff=-1, cutoffo=-1,  p.adjust.method="fdr", significance=0.05)
 }
 \arguments{
   \item{nsim}{
@@ -76,6 +76,12 @@ A numeric or integer value. Tags with DNA count less than or equal to \code{cuto
 }
   \item{cutoffo}{
 A numeric or integer value. Tags with RNA count less than or equal to \code{cutoffo} in any of the RNA replicates will be removed.
+}
+  \item{p.adjust.method}{
+A character string. The correction method for multiple comparisons, the options are: holm, hochberg, hommel, bonferroni, BH, BY, fdr, and none. See \code{\link[stats:p.adjust]{stats}}.
+}
+   \item{significance}{
+The significance level used to estimate power.
 }
 }
 \details{
