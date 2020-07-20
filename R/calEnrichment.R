@@ -5,8 +5,9 @@ function(resultAll, threshold=0.05)
 		for(i in 3:ncol(resultAll))
 		{	dataFrame = resultAll[resultAll$resInput >=0 & resultAll[,i] >= 0 & !is.na(resultAll$resInput) & !is.na(resultAll[,i]),]
 			ddtemp = dataFrame[dataFrame[,i]<threshold,]
-			MWP = data.frame(method = colnames(resultAll)[i], q=sum(ddtemp$resInput<threshold), m=nrow(ddtemp), enrichP=phyper(q=sum(ddtemp$resInput<threshold)-1, m=nrow(ddtemp), n=nrow(dataFrame)-nrow(ddtemp), k=sum(dataFrame$resInput<threshold), lower.tail=F))
+			MWP = data.frame(method = colnames(resultAll)[i], q=sum(ddtemp$resInput<threshold, na.rm=T)-1, m=nrow(ddtemp), n=nrow(dataFrame)-nrow(ddtemp), k=sum(dataFrame$resInput<threshold,na.rm=T), enrichP=phyper(q=sum(ddtemp$resInput<threshold, na.rm=T)-1, m=nrow(ddtemp), n=nrow(dataFrame)-nrow(ddtemp), k=sum(dataFrame$resInput<threshold,na.rm=T), lower.tail=F))
 			enrichment =rbind(enrichment, MWP)
 		}
 		return(enrichment)
 }
+

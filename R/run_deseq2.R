@@ -1,17 +1,14 @@
 run_deseq2 <-
 function(oligo, ntag, nsim, nrep)
-{		oligo$input_sum = apply(as.matrix(oligo[,(3:(2+nrep))]), 1, mean, na.rm=T)
+{		
 		notTwoAllele = names(table(oligo$simN)[table(oligo$simN)<2])
         oligo2 = oligo[!oligo$simN %in% notTwoAllele,]
 	    if(nrow(oligo2)<=2)
 		{	return(NA)
 		}
-		meanInput = apply(oligo2[,c(3:(2+nrep))], 1, mean, na.rm=T)
 		RNAdata = oligo2[,c(1:2, (3+nrep):(2+2*nrep))]
 		DNAdata = oligo2[,c(1:(2+nrep))]
-		for(col in 3:ncol(DNAdata))
-		{	DNAdata[,col] = meanInput
-		}
+		
 		resRNAMatrix = merge(RNAdata[grepl("Ref", RNAdata$allele),], RNAdata[grepl("Mut", RNAdata$allele),], by="simN", sort=F)
 		resDNAMatrix = merge(DNAdata[grepl("Ref", DNAdata$allele),], DNAdata[grepl("Mut", DNAdata$allele),], by="simN", sort=F)
 		resRNAMatrix2=resRNAMatrix[,c(3:(2+nrep), (4+nrep):(3+2*nrep))]
@@ -19,14 +16,14 @@ function(oligo, ntag, nsim, nrep)
 		colnames(resRNAMatrix2) = colnames(resDNAMatrix2) = c(paste(paste0("output_rep",1:nrep), "A", sep="_"), paste(paste0("output_rep",1:nrep), "T", sep="_"))
 		rownames(resRNAMatrix2) = rownames(resDNAMatrix2) = resRNAMatrix$simN
 		
-		ratioMatrix2 = (as.matrix(resRNAMatrix2)+1)/(as.matrix(resDNAMatrix2)+1)
 		coldata = data.frame(group=c(rep("A", nrep), rep("T", nrep)))
-		rownames(coldata) = colnames(ratioMatrix2)
+		rownames(coldata) = colnames(resRNAMatrix2)
 		dds <- DESeqDataSetFromMatrix(countData = ceiling(resRNAMatrix2),
                               colData = coldata,
                               design = ~ group)
         normalFactor = as.matrix(ceiling(resDNAMatrix2))
-        normalizationFactors(dds) =normalFactor/exp(rowMeans(log(normalFactor)))
+        #normalizationFactors(dds) =normalFactor/exp(rowMeans(log(normalFactor)))
+        normalizationFactors(dds) =(normalFactor+1)/exp(rowMeans(log(normalFactor+1)))
         
         result = tryCatch(
         {       DESeq(dds)

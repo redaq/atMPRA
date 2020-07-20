@@ -79,7 +79,7 @@ sim_fixDepth <- function(inputProp, ntag, nsim, nrepIn,  nrepOut, slope, inputDi
 	 { 	sigma2_DNA_a0 = inputDispParam[1]
 	 	sigma2_DNA_a1 = inputDispParam[2]
 	 	sigma2_DNA_0 = sigma2_DNA_a0 + sigma2_DNA_a1/mean_input
-		sigma2_DNA = exp(rnorm(length(muinput), mean=log(sigma2_DNA_0), sd=inputDispParam[3]))
+		sigma2_DNA = exp(rnorm(length(muinput), mean=log(sigma2_DNA_0), sd=sqrt(inputDispParam[3])))
 	 }
 
 	  for(rep in 1:nrepIn)
@@ -120,7 +120,7 @@ sim_fixDepth <- function(inputProp, ntag, nsim, nrepIn,  nrepOut, slope, inputDi
 	  {			sigma2_RNA_a0 = outputDispParam[1]
 				sigma2_RNA_a1 = outputDispParam[2]
 				sigma2_RNA_0 = sigma2_RNA_a0 + sigma2_RNA_a1/mean_output
-				sigma2_RNA = exp(rnorm(length(muinput), mean=log(sigma2_RNA_0), sd=outputDispParam[3]))
+				sigma2_RNA = exp(rnorm(length(muinput), mean=log(sigma2_RNA_0), sd=sqrt(outputDispParam[3])))
 
 	  }
 

@@ -36,7 +36,7 @@ sim_fixInputMean <- function(mean_A, mean_B,  ntag, nsim, nrepIn, nrepOut, slope
 		  muinput <- c(input1, input2)
 		  inputProp = muinput/sum(muinput)
 		  sampleDepth = sum(muinput)
-		  datt = sim_fixDepth(inputProp, ntag=ntag, nsim=nsim, nrepIn=nrepIn,  nrepOut=nrepOut, slope=slope, inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc, inputDispParam=NA, outputDispParam=NA, sampleDepth=sampleDepth) 
+		  datt = sim_fixDepth(inputProp, ntag=ntag, nsim=nsim, nrepIn=nrepIn,  nrepOut=nrepOut, slope=slope, inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc, inputDispParam=inputDispParam, outputDispParam=outputDispParam, sampleDepth=sampleDepth) 
 		  return(datt)
 }
 		  

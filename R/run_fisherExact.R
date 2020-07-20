@@ -1,7 +1,7 @@
 run_fisherExact <-
 function(oligo, ntag, nsim, nrep)
 {	  
-		oligo$input_sum = apply(as.matrix(oligo[,(3:(2+nrep))]), 1, mean, na.rm=T)
+		
 		notTwoAllele = names(table(oligo$simN)[table(oligo$simN)<2])
         oligo2 = oligo[!oligo$simN %in% notTwoAllele,]
 		if(nrow(oligo2)==0)
