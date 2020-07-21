@@ -3,7 +3,7 @@ title: "@MPRA package vignette"
 author: "Dandi Qiao"
 date: "`r Sys.Date()`"
 output: 
-  pdf_document:
+  html_document:
     toc: true
     toc_depth: 2
 vignette: >
