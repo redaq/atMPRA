@@ -13,15 +13,27 @@ This package is dependent on the R packages:
 coin, MatchIt (Available on CRAN)
 
 DESeq2,   mpra, edgeR (Avaiable on Bioconductor)
+For example, you can install DESeq2 using:
+```r
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("DESeq2")
+```
 
 QuASAR (Available here: https://github.com/piquelab/QuASAR)
+You can install it using:
+```r
+require(devtools)
+install_github('piquelab/QuASAR')
+library('QuASAR')
+```
 
-
-After the packages above are successfully installed, please download the atMPRA_1.3.tar.gz file.
+After the packages above are successfully installed, please download the atMPRA_1.7.tar.gz file.
 
 In R, type: 
 ```r
-install.packages("atMPRA_1.7.tar.gz", repos=NULL, type="source")
+install.packages("atMPRA_1.7.tar.gz", repos = NULL, type = "source")
 
 library(atMPRA)
 ```
