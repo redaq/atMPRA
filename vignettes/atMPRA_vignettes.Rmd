@@ -14,29 +14,54 @@ vignette: >
 
 
 #1 Introduction
-The analysis toolset for MPRA data includes functions for simulating and analyzing MPRA data, and for power calculations of MPRA experiments. This tutorial briefly introduces the functions provided by the \@MPRA package, using the example data included in the package.
+The analysis toolset for MPRA data (\@MPRA) includes functions for simulating and analyzing MPRA data, and for power calculations of MPRA experiments. This tutorial briefly introduces the functions provided by the \@MPRA package, using the example data included in the package.
 
 We can load the library using:
 
-```{r}
+```{r, message=FALSE}
 library(atMPRA)
 ```
 
 We can do a quick power calculation:
-```{r}
+```{r, message=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=65)}
 nsim=10
 ntag=10
 
 result = getPower(nsim=nsim, ntag=ntag, nrepIn=3, nrepOut=3, slope = c(rep(1, ntag*nsim), rep(2,ntag*nsim)), method=c("MW", "mpra_lm"), scenario="fixTotalDepth")
 
+result$Power
 ```
 
 #2 Data available in the package
 
-The estimated distributional parameters of the MPRA data (GSE70531 in GEO database) using the estimateMPRA function in this package. The estimation was done using DESeq2. This distribution will be the default distribution for simulating MPRA data in this package if not specified otherwise. The data is loaded with the package.
+The estimated distributional parameters of the MPRA data (GSE70531 in GEO database) was obtained using the `estimateMPRA` function in this package. The basic parameters include \\
+`inputProp`: The proportion of counts per tag among all tags in the library\\
+`transEff`: The distribution of transfection efficiencies (normalized RNA/DNA ratio) across tags\\
+`dispFunc_input`: The dispersion function of the input tag counts across replicates as a function of the mean \\
+`dispFunc_output`: The dispersion function of the output tag counts across replicates as a function of the mean\\
+\\
+
+We assume that the tag counts across replicates follow a Negative Binomial distribution with mean $\mu$ and dispersion $\sigma^2$. Then the variance is $\mu + \sigma^2\mu^2$. 
+
+However, it is observed that the dispersion parameter is not constant in RNA-Seq data. In DESeq2, it was assumed that:
+\[ log(\sigma^2) \sim N(log(a+b/\mu), \sigma_d^2) \]
+We will use the dispersion function estimated by DESeq2 to generate count data here.
+
+The estimation parameters for GSE70531 was done using the `estimateMPRA` function which used DESeq2 package. This distribution will be the default distribution for simulating MPRA data in this package if not specified otherwise. The data is loaded with the package automatically.
 
 ```{r}
 GSE70531_params
+```
+
+The input proportions are usually very skewed due to cloning and PCR.
+```{r}
+plot(density(GSE70531_params[[3]](runif(10000))), main="input proportions across tags")
+
+```
+The transfection efficiency distribution for GSE70531 looks like this:
+```{r}
+plot(density(GSE70531_params[[4]](runif(10000))), main="Transfection efficiency across tags")
+
 ```
 
 #3 Functions
@@ -44,20 +69,30 @@ GSE70531_params
 ## 3.1 Simulating MPRA data
 
 There are multiple ways to simulate MPRA data in this package:
+
 1. Simulating MPRA data using default distribution.
+
 2. Simulating MPRA data using estimated distributions from observed data
+
 3. Simulating MPRA data by specifying parameters in the model.
 
 The parameters for simulating a MPRA dataset includes:
+
 1. number of SNPs in the data (`nsim`)
+
 2. number of tags per SNP (`ntag`)
+
 3. number of replicates in the input and output (`nrepIn`, `nrepOut`)
+
 4. RNA/DNA ratio for all tags (`slope`)
+
 5. Total depth for one replicate (`fixTotalD`) or mean depth per tag (`fixMeanD`)
+
+### 3.1.1 Simulating MPRA data using estimated distributions from observed data
 
 We have simulated the MPRA using defulat settings above. Now we want to demonstrate how to simulate MPRA using estimated distribution from observed data. Here we will use the parameters we estimated for GSE70531.
 
-```{r}
+```{r, message=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=64)}
 totalDepth = 200000
 
 ntag= 10
@@ -75,33 +110,63 @@ slopel = GSE70531_params[[4]](runif(nsim*2))
 inputDispFunc=GSE70531_params[[1]]
 
 outputDispFunc=GSE70531_params[[2]]
+
 slope = rep(slopel, each=ntag)
+
 datt=sim_fixDepth(inputProp, ntag, nsim, nrepIn,  nrepOut, slope, inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc, sampleDepth=totalDepth) 
 
+datt[1:10,]
+
 ```
+
 
 If we would like to simulate data based on an observed MPRA dataset, we can estimate the parameters using the function `estimateMPRA`.
-```{r}
+```{r, message=FALSE}
+rnaCol=8
+
 new_params=estimateMPRA(datt, nrepIn, rnaCol, nrepOut, nsim, ntag)
+
+new_params
 ```
+
 
 Then we can simulate new MPRA data using these parameters:
-```{r}
+```{r, message=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 datt=sim_fixDepth(inputProp=new_params[[3]](runif(ntag*nsim*2)), ntag, nsim, nrepIn,  nrepOut, slope, inputDispFunc=new_params[[1]], outputDispFunc=new_params[[2]], sampleDepth=totalDepth)
+
+datt[1:10,]
 ```
 
+
+### 3.1.2 Simulating MPRA data by specifying parameters in the model.
+
 We can also simulate MPRA data by specifying parameters. For example, we may want to specify different mean input counts across tags for allele A and allele B. We can check if methods are biased by the allelic imbalance in the input distribution later using this simulated data.
-```{r}
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 inputDist= GSE70531_params[[3]](runif(nsim*ntag*2))
 
 datt=sim_fixInputMean(mean_A=10, mean_B=100,  ntag=ntag, nsim=nsim, nrepIn=nrepIn, nrepOut=nrepOut, slope=slope, inputDist=inputDist, inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc)
 
-```
+datt[c(1:5, 101:105),]
 
+```
+Note the distribution of counts are very different between the two alleles `Ref` and `Mut `.
+
+
+Another way to specify the dispersion function is through `inputDispParam` and `outputDispParam`. These parameters are required if `inputDispFunc` and `outputDispFunc` are not provided. Each of them should give the three parameter estimates ($a, b, \sigma_d^2$) for the dispersion function of the DNA input or RNA output counts across replicates. The three parameters correspond to $a$, $b$, and $\sigma_d^2$, which specify that the dispersion parameter is a lognormal distribution with mean $log(a+b/\mu)$ and sd $\sigma_d^2$, where $\mu$ is the mean of RNA count across the replicates.
+
+```{r,message=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+
+datt=sim_fixDepth(inputProp=new_params[[3]](runif(ntag*nsim*2)), ntag, nsim, nrepIn,  nrepOut, slope, inputDispParam=c(0, 4.37, 0.25), outputDispParam=c(0.54, 12, 0.25), sampleDepth=totalDepth)
+### Thesea are default dispersion parameters, if none was specified.
+datt[1:10,]
+
+
+```
 
 ## 3.2 Analyze MPRA data
 
-We provide a list of methods to analyze MPRA data. The input MPRA data frame should have nsim*ntag*2 rows and 2+nrepIn+nrepOut columns. The first column should be named 'allele', and the second column should be named 'simN'. The 'allele' columns should contain only two possible values 'Ref' and 'Mut' to refer to the two versions of alleles for each SNP.
+We provide a list of methods to analyze MPRA data. The input MPRA data frame should have `nsim*ntag*2` rows and `2+nrepIn+nrepOut` columns. The first column should be named 'allele', and the second column should be named 'simN'. The 'allele' columns should contain only two possible values 'Ref' and 'Mut' to refer to the two versions of alleles for each SNP.
 
 A list of the methods that are available is here:
 ```{r, echo=FALSE}
@@ -110,12 +175,15 @@ library(knitr)
 methodTable = data.frame(Test=c("Mann-Whitney", "Matching", "Adaptive", "QuASAR-MPRA", "Fisher's Exact Test", "T-test", "mpralm using mean", "mpralm using sum", "edgeR", "DESeq2"), singleReplicate=c(rep("YES", 5), rep("NO", 5)), OptionName=c("MW", "Matching", "Adaptive", "QuASAR", "Fisher", "T-test", "mpralm", "mpralm", "edgeR", "DESeq2"))
 kable(methodTable)
 
+
 ```
 
 To analyze a formmated MPRA data:
-```{r}
+```{r, message=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 datt[1:10, ]
 results = analyzeMPRA(datt, nrepIn, rnaCol, nrepOut, nsim, ntag, method=c("MW", "Adaptive", "QuASAR", "T-test", "mpralm", "DESeq2"), cutoff=0, cutoffo=0)
+
+results
 
 ```
 You can remove tags with mean counts less than the cutoffs specified for the input and output.
@@ -123,7 +191,7 @@ You can remove tags with mean counts less than the cutoffs specified for the inp
 ## 3.3 Power calculation
 
 We can compute power based on simulated MPRA data specified using the options described above. Addition parameters here include the correction method for multiple testing, and the significance level to be used.
-```{r}
+```{r,  message=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 nrepIn=2
 nrepOut = 2
 slopel = GSE70531_params[[4]](runif(nsim))
@@ -131,13 +199,27 @@ slopel = c(slopel, slopel+1)
 slope = rep(slopel, each=ntag)
 result2 = getPower(nsim, ntag, nrepIn, nrepOut, slope, scenario="fixInputDist", method=c("MW","T-test", "mpralm", "edgeR", "DESeq2"), fixInput  = c(20, 100), inputDist=inputDist, inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc,  cutoff=-1, cutoffo=-1)
 
-result3 = getPower(nsim, ntag, nrepIn, nrepOut, slope=1, scenario="fixTotalDepth", method=c("MW", "Matching", "Adaptive", "Fisher", "QuASAR", "T-test", "mpralm", "edgeR", "DESeq2"), fixTotalD= 200000, inputDist=inputDist,inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc,  cutoff=-1, cutoffo=-1, matched=TRUE)
-
+result2$Power
 
 ```
 
 
-## 3.4. Other useful methods
+```{r, message=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+result3 = getPower(nsim, ntag, nrepIn, nrepOut, slope=1, scenario="fixTotalDepth", method=c("MW", "Matching", "Adaptive", "Fisher", "QuASAR", "T-test", "mpralm", "edgeR", "DESeq2"), fixTotalD= 200000, inputDist=inputDist,inputDispFunc=inputDispFunc, outputDispFunc=outputDispFunc,  cutoff=-1, cutoffo=-1)
+
+result3$Power
+
+```
+
+
+## 3.4. Other methods included
+
+`calEnrichment`: This function uses hypergeometric tests to compute enrichment in SNPs with significant allelic DNA imbalance among the SNPs with significant allele-specific effect defined by each method. 
+
+```{r}
+calEnrichment(results$resultAll)
+```
+
 
 
 
