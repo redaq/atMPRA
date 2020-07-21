@@ -21,12 +21,12 @@ After the packages above are successfully installed, please download the atMPRA_
 
 In R, type: 
 ```r
-install.packages("atMPRA_1.3.tar.gz", repos=NULL, type="source")
+install.packages("atMPRA_1.7.tar.gz", repos=NULL, type="source")
 
 library(atMPRA)
 ```
 
-More tutorials can be found in the [vignette](https://github.com/redaq/atMPRA/blob/master/atMPRA_vignettes.pdf). 
+More tutorials can be found in the [vignette](https://github.com/redaq/atMPRA/blob/master/vignettes/atMPRA_vignettes.pdf). 
 
 # Quick example
 ```r
